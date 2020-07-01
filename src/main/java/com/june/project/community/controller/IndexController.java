@@ -1,7 +1,11 @@
 package com.june.project.community.controller;
 
+import com.june.project.community.dto.QuestionDTO;
+import com.june.project.community.mapper.QuestionMapper;
 import com.june.project.community.mapper.UserMapper;
+import com.june.project.community.model.Question;
 import com.june.project.community.model.User;
+import com.june.project.community.service.QuestionService;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author June
@@ -18,6 +23,9 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Controller
 public class IndexController {
+
+    @Autowired
+    private QuestionService questionService;
 
     @Autowired
     private UserMapper userMapper;
@@ -28,7 +36,8 @@ public class IndexController {
     * 该用户登录过，我们就直接在request中set用户，然后在前端判断user是否存在从而显示登录后的界面
      */
     @GetMapping("/")
-    public String index(HttpServletRequest request) {
+    public String index(HttpServletRequest request,
+                        Model model) {  // 注入 Model，因为要把数据传到前端，具体数据是 question 的列表
         Cookie[] cookies = request.getCookies();
         if(cookies != null && cookies.length != 0) {
             for(Cookie cookie : cookies) {
@@ -42,6 +51,10 @@ public class IndexController {
                 }
             }
         }
+
+        List<QuestionDTO> questionList = questionService.list();
+        model.addAttribute("questions", questionList);
+        // 在跳转到 index.html 之前把所需的数据放进去，如 question 列表
         return "index";
     }
 }

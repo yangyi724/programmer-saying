@@ -3,6 +3,7 @@ package com.june.project.community.mapper;
 import com.june.project.community.model.User;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 /**
@@ -15,6 +16,9 @@ public interface UserMapper {
     void insert(User user);
 
     // @Param("token")
-    @Select("select * from user where token = #{token}")
-    User findByToken( String token);
+    @Select("select * from user where token = #{token_}")
+    User findByToken(@Param("token_") String token);
+
+    @Select("select * from user where id = #{id_}")
+    User findById(@Param("id_") Integer id);
 }

@@ -39,10 +39,11 @@ public class PublishController {
             @RequestParam("tag") String tag,
             HttpServletRequest request,
             Model model){
+        // model 用于把数据写到前台页面，前台可以用  th:text="${title}" 获取
         model.addAttribute("title",title);
         model.addAttribute("description",description);
         model.addAttribute("tag",tag);
-        // 前端可以用  th:text="${title}" 获取
+
 
         if(title == null || title == "") {
             model.addAttribute("error", "标题不能为空");
