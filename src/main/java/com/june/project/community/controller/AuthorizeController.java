@@ -50,7 +50,7 @@ public class AuthorizeController {
         String accessToken = githubProvider.getAccessToken(accessTokenDTO);
         System.out.println(accessToken);
         GithubUser githubUser = githubProvider.getUser(accessToken);
-        if(githubUser != null) {
+        if(githubUser != null && githubUser.getId() != null) {
             User user = new User();
             String token = UUID.randomUUID().toString();
             user.setToken(token);
@@ -66,4 +66,4 @@ public class AuthorizeController {
             return "redirect:/";
         }
     }
-}po
+}
