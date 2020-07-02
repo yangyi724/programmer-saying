@@ -25,8 +25,6 @@ public class ProfileController {
     @Autowired
     private QuestionService questionService;
 
-    @Autowired
-    private UserMapper userMapper;
 
     // 希望调用 profile.html 的时候访问 ProfileController
     @GetMapping("/profile/{action}")
@@ -35,21 +33,7 @@ public class ProfileController {
                           Model model,
                           @RequestParam(name = "page", defaultValue = "1") Integer page,      // 分页 1.：page 分页的页码， size 分页数
                           @RequestParam(name = "size", defaultValue = "5") Integer size) {
-        User user = null;
-        Cookie[] cookies = request.getCookies();
-        if(cookies != null && cookies.length != 0) {
-            for(Cookie cookie : cookies) {
-                if(cookie.getName().equals("token")) {
-                    String token = cookie.getValue();
-                    user = userMapper.findByToken(token);
-                    if(user != null) {
-                        request.getSession().setAttribute("user", user);
-                    }
-                    break;
-                }
-            }
-        }
-
+        User user = (User) request.getSession().getAttribute("user");
         if(user == null) {
             return "redirect:/";
         }

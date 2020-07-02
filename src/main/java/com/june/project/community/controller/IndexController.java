@@ -28,9 +28,6 @@ public class IndexController {
     @Autowired
     private QuestionService questionService;
 
-    @Autowired
-    private UserMapper userMapper;
-
     /*
     * 每次回到主页的时候都在reuqest(request是浏览器发送到服务端的)中取得名为"token"的cookie，这个cookie是我们在AuthorizeController
     * 中利用response添加的。如果找到这个cookie再从数据库中找有没有和这个cookie(含义就是token)的value相同的user，如果有，说明
@@ -42,19 +39,6 @@ public class IndexController {
                         @RequestParam(name = "page", defaultValue = "1") Integer page,      // 分页 1.：page 分页的页码， size 分页数
                         @RequestParam(name = "size", defaultValue = "5") Integer size) {  // @RequestParam 注入 Model，因为要把数据传到前端，具体数据是 question 的列表，这里是接收前端传来的 page 和 size 数据
         // 首页加载：先从数据库中看寻找有没有和传到服务器端 cookie 相对应的 user 信息，若有，把该用户信息传回浏览器，表示已登录
-        Cookie[] cookies = request.getCookies();
-        if(cookies != null && cookies.length != 0) {
-            for(Cookie cookie : cookies) {
-                if(cookie.getName().equals("token")) {
-                    String token = cookie.getValue();
-                    User user = userMapper.findByToken(token);
-                    if(user != null) {
-                        request.getSession().setAttribute("user", user);
-                    }
-                    break;
-                }
-            }
-        }
 
         PaginationDTO pagination = questionService.list(page, size); // 分页 2.：把两个参数传入 Service
         model.addAttribute("pagination", pagination);  // 引号中的是前端的变量名
