@@ -10,3 +10,23 @@ questionService：调用 paginationDTO.setPagination() 计算分页栏的展示�
 |
 前端：用户点击分页产生新的 page，再次传入后端，迭代
 ```
+
+# 登录
+
+1. 从 github 获取所有信息之后，不直接插入新用户，先判断数据库中是否有该用户，再判断是插入还是更新
+
+对于github用户，唯一的就是accountId，所以使用github登录成功，要使用accountId在数据库中查一下有没有这个数据，如果有这个数据就把最新的token更新进去，相当于之前的登录态是不需要的，需要把token刷新一下
+
+具体操作：
+如果通过数据库能够查到accountId等于当前登录成功的accountId，就把当前数据库的token更新；如果没有就做插入操作
+
+
+# 登出
+
+把 session 中的 user 和 cookie 中的 token 都删除
+
+# 问题详情页面
+
+### 编辑逻辑
+
+若发布人是登录用户，显示编辑按钮，否则不显示

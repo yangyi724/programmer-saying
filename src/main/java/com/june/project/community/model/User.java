@@ -7,7 +7,8 @@ import lombok.Data;
  * @date 2020/6/30 - 22:28
  */
 @Data
-public class User {
+public class
+User {
     private int id;
     private String name;
     private String accountId;
