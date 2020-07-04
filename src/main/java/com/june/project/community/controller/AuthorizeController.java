@@ -34,7 +34,6 @@ public class AuthorizeController {
     @Value("${github.redirect.uri}")
     private String redirectUri;
 
-    @Autowired
     private UserMapper userMapper;
 
     @Autowired
@@ -43,7 +42,7 @@ public class AuthorizeController {
     @GetMapping("/callback")
     public String callback(@RequestParam(name="code") String code,
                            @RequestParam(name="state") String state,
-                           HttpServletResponse response) {
+                           HttpServletResponse response) throws Exception {
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         accessTokenDTO.setClient_id(clientId);
         accessTokenDTO.setClient_secret(clientSecret);

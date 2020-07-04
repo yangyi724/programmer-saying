@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
  * @date 2020/7/2 - 23:01
  */
 @ControllerAdvice
-public class CustomizeExceptionHandler {
+public class CustomizeExceptionHandler { // 只能拦截所有mvc可以handle的异常，不能handle的异常怎么办，那么需要做一个通用的controller处理
     @ExceptionHandler(Exception.class)
     ModelAndView handle(HttpServletRequest request, Throwable e, Model model) { // ModelAndView表示渲染后的页面，和Controller里面的return "index"返回的是一样的
         if(e instanceof CustomizeException) {
