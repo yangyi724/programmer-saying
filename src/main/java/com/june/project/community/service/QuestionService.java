@@ -4,6 +4,7 @@ import com.june.project.community.dto.PaginationDTO;
 import com.june.project.community.dto.QuestionDTO;
 import com.june.project.community.exception.CustomizeErrorCode;
 import com.june.project.community.exception.CustomizeException;
+import com.june.project.community.mapper.QuestionExtMapper;
 import com.june.project.community.mapper.QuestionMapper;
 import com.june.project.community.mapper.UserMapper;
 import com.june.project.community.model.Question;
@@ -32,6 +33,10 @@ public class QuestionService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private QuestionExtMapper questionExtMapper;
+
 
 
     public PaginationDTO list(Integer page, Integer size) {
@@ -95,10 +100,7 @@ public class QuestionService {
             page = totalPage;
         }
 
-
         paginationDTO.setPagination(totalPage, page); // 分页 4. ：通过 totalCount, page, size 算出分页需要的其他数据，如是否展示上一页，下一页，首尾页等
-
-
 
         // offset : size*(page-1)
         Integer offset = size * (page - 1);
@@ -151,5 +153,13 @@ public class QuestionService {
                 throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
             }
         }
+    }
+
+    // 并发问题，多个人同时阅读同一篇文章，怎么解决
+    public void incView(Integer id) {
+        Question question = new Question();
+        question.setId(id);
+        question.setViewCount(1);
+        questionExtMapper.incView(question);
     }
 }

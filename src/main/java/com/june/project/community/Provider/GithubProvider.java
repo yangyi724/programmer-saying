@@ -5,16 +5,23 @@ import com.june.project.community.dto.AccessTokenDTO;
 import com.june.project.community.dto.GithubUser;
 import okhttp3.*;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 /**
  * @author June
@@ -28,21 +35,53 @@ public class GithubProvider {
      *    access_token=e72e16c7e42f292c6912e7710c838347ae178b4a&token_type=bearer
      * 4. 获取到 access_token，返回 access_token
      */
-    public String getAccessToken(AccessTokenDTO accessTokenDTO) {
-        MediaType mediaType = MediaType.get("application/json; charset=utf-8");
-        OkHttpClient client = new OkHttpClient();
+//    public String getAccessToken(AccessTokenDTO accessTokenDTO) {
+//        MediaType mediaType = MediaType.get("application/json; charset=utf-8");
+//        OkHttpClient client = new OkHttpClient();
+//        RequestBody body = RequestBody.create(mediaType, JSON.toJSONString(accessTokenDTO));
+//        Request request = new Request.Builder()
+//                .url("https://github.com/login/oauth/access_token")
+//                .post(body)
+//                .build();
+//        try (Response response = client.newCall(request).execute()) {
+//            String string = response.body().string();
+//            String token = string.split("&")[0].split("=")[1];
+//            return token;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
-        RequestBody body = RequestBody.create(mediaType, JSON.toJSONString(accessTokenDTO));
-        Request request = new Request.Builder()
-                .url("https://github.com/login/oauth/access_token")
-                .post(body)
+    public String getAccessToken(AccessTokenDTO accessTokenDTO) {
+        int timeout = 60;
+        RequestConfig defaultRequestConfig = RequestConfig.custom()
+                .setSocketTimeout(timeout * 1000)
+                .setConnectTimeout(timeout * 1000)
+                .setConnectionRequestTimeout(timeout * 1000)
                 .build();
-        try (Response response = client.newCall(request).execute()) {
-            String string = response.body().string();
-            String token = string.split("&")[0].split("=")[1];
-            return token;
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost("https://github.com/login/oauth/access_token");
+        httpPost.setConfig(defaultRequestConfig);
+        httpPost.setHeader("Content-Type", "application/json");
+        try {
+            httpPost.setEntity(new StringEntity(JSON.toJSONString(accessTokenDTO), ContentType.create("application/json", "utf-8")));
+            HttpResponse response = httpClient.execute(httpPost);
+            if (response != null && response.getStatusLine().getStatusCode() == 200) {
+                String result = EntityUtils.toString(response.getEntity());
+                String token = result.split("&")[0].split("=")[1];
+                return token;
+            }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (null != httpClient) {
+                try {
+                    httpClient.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return null;
     }
