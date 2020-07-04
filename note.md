@@ -30,3 +30,12 @@ questionService：调用 paginationDTO.setPagination() 计算分页栏的展示�
 ### 编辑逻辑
 
 若发布人是登录用户，显示编辑按钮，否则不显示
+
+
+# Mybatis 逆向工程
+
+每次修改 Mapper 和 Model 会很麻烦，用逆向工程可以让我们不用写sql语句和model，mybatis自动帮我们产生
+
+# 错误页面 AOP
+
+可能产生错误的地方有很多个，若在这些地方都加上判断逻辑很杂乱，则想到封装，AOP
