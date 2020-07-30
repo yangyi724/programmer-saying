@@ -20,6 +20,10 @@ questionService：调用 paginationDTO.setPagination() 计算分页栏的展示�
 具体操作：
 如果通过数据库能够查到accountId等于当前登录成功的accountId，就把当前数据库的token更新；如果没有就做插入操作
 
+# 维持登录态
+
+拦截器，拦截每个页面，验证cookie中是否有与user表中的token字段相同的值，若有，显示该用户的登录态；否则，未登录
+https://blog.csdn.net/qq_35098526/article/details/88734991
 
 # 登出
 
@@ -39,3 +43,13 @@ questionService：调用 paginationDTO.setPagination() 计算分页栏的展示�
 # 错误页面 AOP
 
 可能产生错误的地方有很多个，若在这些地方都加上判断逻辑很杂乱，则想到封装，AOP
+
+# 回复
+
+Spring mvc 自动序列化，发序列化
+
+JS 局部刷新
+
+# Bug解决
+
+拦截器把静态资源拦截了

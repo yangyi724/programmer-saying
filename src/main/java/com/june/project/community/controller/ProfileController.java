@@ -34,6 +34,7 @@ public class ProfileController {
                           @RequestParam(name = "page", defaultValue = "1") Integer page,      // 分页 1.：page 分页的页码， size 分页数
                           @RequestParam(name = "size", defaultValue = "5") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
+
         if(user == null) {
             return "redirect:/";
         }

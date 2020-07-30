@@ -13,8 +13,8 @@ import com.june.project.community.model.User;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.CustomAutowireConfigurer;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +77,7 @@ public class QuestionService {
         return paginationDTO;
     }
 
-    public PaginationDTO list(int userId, Integer page, Integer size) {
+    public PaginationDTO list(Long userId, Integer page, Integer size) {
         PaginationDTO paginationDTO = new PaginationDTO();
         QuestionExample questionExample = new QuestionExample();
         questionExample.createCriteria()
@@ -120,7 +120,7 @@ public class QuestionService {
         return paginationDTO;
     }
 
-    public QuestionDTO getById(Integer id) {
+    public QuestionDTO getById(Long id) {
         Question question = questionMapper.selectByPrimaryKey(id);
         if(question == null) {
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
@@ -137,6 +137,10 @@ public class QuestionService {
             // 创建
             question.setGmtCreate(System.currentTimeMillis());
             question.setGmtModified(question.getGmtCreate());
+            question.setViewCount(0);
+            question.setLikeCount(0);
+            question.setLikeCount(0);
+            question.setCommentCount(0);
             questionMapper.insert(question);
         } else {
             // 更新
@@ -156,10 +160,31 @@ public class QuestionService {
     }
 
     // 并发问题，多个人同时阅读同一篇文章，怎么解决
-    public void incView(Integer id) {
+    @Transactional
+    public void incView(Long id) {
         Question question = new Question();
         question.setId(id);
         question.setViewCount(1);
         questionExtMapper.incView(question);
+    }
+
+    @Transactional
+    public void updateByTag(String tag) {
+        Question updateQuestion = new Question();
+        updateQuestion.setGmtModified(System.currentTimeMillis());
+        QuestionExample example = new QuestionExample();
+        example.createCriteria()
+                .andTagEqualTo(tag);
+        QuestionExample questionExample = new QuestionExample();
+        questionExample.createCriteria()
+                .andTagEqualTo("待学");
+        try {
+            questionMapper.selectByExample(questionExample);
+            questionMapper.updateByExampleSelective(updateQuestion, example);
+            Thread.sleep(60000);
+            System.out.println("sleeping...");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

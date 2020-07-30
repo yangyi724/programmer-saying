@@ -16,13 +16,21 @@ import java.util.List;
 /**
  * @author June
  * @date 2020/7/2 - 13:18
+ * 自定义拦截器
  */
 @Service
 public class SessionInterceptor implements HandlerInterceptor {
     @Autowired
     private UserMapper userMapper;
 
-    // 在程序处理之前执行
+    /*
+    * 使用拦截器维持登录态
+    * 在controller之前执行
+    * 对所有页面拦截，查看 cookies 中有没有和 user 表的 token 字段匹配的 token，若有，说明是登录态
+    * ps: 这里的 session 是 session 域
+    * session 是个虚拟概念，代表了一个虚拟的会话过程
+    * session-data 是个实体概念，代表这个会话中的独享数据（例如登录状态、用户信息等）
+     */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         Cookie[] cookies = request.getCookies();
@@ -35,7 +43,7 @@ public class SessionInterceptor implements HandlerInterceptor {
                             .andTokenEqualTo(token);
                     List<User> users = userMapper.selectByExample(userExample);
                     if(users.size() != 0) {
-                        request.getSession().setAttribute("user", users.get(0));
+                        request.getSession().setAttribute("user", users.get(0)); // 若cookie包含有效token，将对应的user信息写到session中，传回前端
                     }
                     break;
                 }

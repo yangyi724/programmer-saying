@@ -6,4 +6,5 @@ package com.june.project.community.exception;
  */
 public interface ICustomizeErrorCode {
     String getMessage();
+    Integer getCode();
 }
