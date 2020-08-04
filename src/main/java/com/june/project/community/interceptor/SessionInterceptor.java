@@ -1,8 +1,10 @@
 package com.june.project.community.interceptor;
 
+import com.june.project.community.mapper.NotificationMapper;
 import com.june.project.community.mapper.UserMapper;
 import com.june.project.community.model.User;
 import com.june.project.community.model.UserExample;
+import com.june.project.community.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -23,6 +25,8 @@ public class SessionInterceptor implements HandlerInterceptor {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private NotificationService notificationService;
     /*
     * 使用拦截器维持登录态
     * 在controller之前执行
@@ -44,6 +48,8 @@ public class SessionInterceptor implements HandlerInterceptor {
                     List<User> users = userMapper.selectByExample(userExample);
                     if(users.size() != 0) {
                         request.getSession().setAttribute("user", users.get(0)); // 若cookie包含有效token，将对应的user信息写到session中，传回前端
+                        Long unreadCount = notificationService.unreadCount(users.get(0).getId());
+                        request.getSession().setAttribute("unreadCount", unreadCount);
                     }
                     break;
                 }

@@ -12,8 +12,8 @@ import java.util.List;
  * @date 2020/7/1 - 22:14
  */
 @Data
-public class PaginationDTO {
-    private List<QuestionDTO> questions;
+public class PaginationDTO<T> {
+    private List<T> data;
     private boolean showPrevious;
     private boolean showFirstPage;
     private boolean showNext;
@@ -24,20 +24,16 @@ public class PaginationDTO {
 
     public void setPagination(Integer totalPage, Integer page) {
         this.totalPage = totalPage;
-
         this.page = page;
         pages.add(page);
         for (int i = 1; i <= 3; i++) {
             if (page - i > 0) {
                 pages.add(0, page - i);
             }
-
             if (page + i <= totalPage) {
                 pages.add(page + i);
             }
         }
-
-
 
         // 是否展示前一页后一页
         if(page == 1) {
@@ -45,7 +41,6 @@ public class PaginationDTO {
         } else {
             showPrevious = true;
         }
-
         if(page == totalPage) {
             showNext = false;
         } else {
@@ -58,12 +53,10 @@ public class PaginationDTO {
         } else {
             showFirstPage = true;
         }
-
         if(pages.contains(totalPage)) {
             showEndPage = false;
         } else {
             showEndPage = true;
         }
-
     }
 }
