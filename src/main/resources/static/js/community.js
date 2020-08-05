@@ -114,6 +114,14 @@ function collapseComments(e) {
     }
 }
 
+
+/**
+* 展示点赞数
+*/
+function likeCount() {
+
+}
+
 function showSelectTag() {
     $("#select-tag").show();
 }

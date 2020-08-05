@@ -31,8 +31,8 @@
                             <a th:href="@{'/question/'+ ${question.id}}" th:text="${question.title}"></a>
                         </h4>
                         <span class="text-desc">
+                            <!--th:text="${question.viewCount}"></span> 次浏览 • <span-->
                         <span th:text="${question.commentCount}"></span> 个回复 • <span
-                                th:text="${question.viewCount}"></span> 次浏览 • <span
                                 th:text="${#dates.format(question.gmtCreate,'yyyy-MM-dd HH:mm')}"></span> •
                         <a th:href="@{'/publish/'+${question.id}}" class="community-menu"
                            th:if="${session.user != null && session.user.id == question.creator}">

@@ -140,7 +140,7 @@ d
     margin-top: 5px;
 }
 
-.menu .icon {
+.menu .like-icon {
     margin-right: 6px;
     font-size: 15px;
     cursor: pointer;
@@ -159,7 +159,7 @@ d
     color: #499ef3;
 }
 
-.menu .icon:hover {
+.menu .like-icon:hover {
     color: #499ef3;
 }
 

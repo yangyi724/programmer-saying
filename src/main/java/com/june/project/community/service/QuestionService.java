@@ -173,6 +173,14 @@ public class QuestionService {
     }
 
     @Transactional
+    public void incMoreView(Long id, int count) {
+        Question question = new Question();
+        question.setId(id);
+        question.setViewCount(count);
+        questionExtMapper.incView(question);
+    }
+
+    @Transactional
     public void updateByTag(String tag) {
         Question updateQuestion = new Question();
         updateQuestion.setGmtModified(System.currentTimeMillis());
