@@ -137,4 +137,25 @@ public class CommentService {
 
         return commentDTOS;
     }
+
+    /**
+     * 按评论id查找评论
+     * @param commentId
+     * @return
+     */
+    public Comment getByCommentId(Long commentId) {
+        return commentMapper.selectByPrimaryKey(commentId);
+    }
+
+    /**
+     * 根据评论id更新评论的点赞数
+     * @param commentId
+     * @param likeCount
+     */
+    public void updateCountById(Long commentId, Integer likeCount) {
+        Comment comment = new Comment();
+        comment.setId(commentId);
+        comment.setLikeCount((long) likeCount);
+        commentMapper.updateByPrimaryKeySelective(comment);
+    }
 }

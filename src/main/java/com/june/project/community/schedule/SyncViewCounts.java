@@ -1,7 +1,6 @@
-package com.june.project.community.jobs;
+package com.june.project.community.schedule;
 
-import com.june.project.community.consts.RedisKey;
-import com.june.project.community.mapper.QuestionMapper;
+import com.june.project.community.enums.RedisKeyEnum;
 import com.june.project.community.service.QuestionService;
 import com.june.project.community.utils.RedisUtil;
 import org.slf4j.Logger;
@@ -9,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
@@ -28,12 +26,12 @@ public class SyncViewCounts {
 
     @Scheduled(cron = "0 0/1 * * * ? ")//每1分钟
     public void SyncNodesAndShips() {
-        logger.info("开始保存点赞数 、浏览数");
+        logger.info("开始保存浏览数");
         try {
             //先获取这段时间的浏览数
-            Map<Object,Object> viewCountItem=redisUtil.hmget(RedisKey.ARTICLE_VIEWCOUNT_KEY);
+            Map<Object,Object> viewCountItem=redisUtil.hmget(RedisKeyEnum.QUESTION_VIEW_COUNT_KEY.getKey());
             //然后删除redis里这段时间的浏览数
-            redisUtil.remove(RedisKey.ARTICLE_VIEWCOUNT_KEY);
+            redisUtil.remove(RedisKeyEnum.QUESTION_VIEW_COUNT_KEY.getKey());
             if(!viewCountItem.isEmpty()){
                 for(Object item :viewCountItem.keySet()){
                     String questionKey=item.toString();//viewcount_1
@@ -49,6 +47,6 @@ public class SyncViewCounts {
             logger.error(e.getMessage());
             e.printStackTrace();
         }
-        logger.info("结束保存点赞数 、浏览数");
+        logger.info("结束保存浏览数");
     }
 }

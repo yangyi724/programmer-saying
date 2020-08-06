@@ -79,10 +79,13 @@
                             <div th:text="${comment.content}"></div>
                             <div class="menu">
                                 <span th:data-id="${comment.id}"
-                                      onclick="likeCount(this)" class="like-icon">
+                                      onclick="like(this)" class="like-icon">
                                     <span class="glyphicon glyphicon-thumbs-up"></span>
-                                    <span th:text="${comment.likeCount}"></span>
+                                    <b th:text="${comment.likeCount}"></b>
                                 </span>
+                <!--                <a href="javascript:" th:onclick="|like(this,2,${commentVo.comment.id},${commentVo.comment.userId},${blog.id})|">
+                                    <b th:text="${commentVo.likeStatus==1?'已赞':'赞'}">赞</b> <i th:text="${commentVo.likeCount}">11</i>
+                                </a>-->
                                 <span th:data-id="${comment.id}"
                                       onclick="collapseComments(this)" class="comment-icon">
                                     <span class="glyphicon glyphicon-comment"></span>

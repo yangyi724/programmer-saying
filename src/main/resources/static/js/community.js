@@ -116,11 +116,49 @@ function collapseComments(e) {
 
 
 /**
-* 展示点赞数
+* 点赞
 */
-function likeCount() {
+function like(e) {
+    var id = e.getAttribute("data-id");
+    var like = $("#like-" + id);
 
+    // 获取一下点赞图标的状态
+    var collapse = e.getAttribute("data-collapse");
+    if (collapse) {
+        // 取消点赞
+        like.removeClass("in");
+        e.removeAttribute("data-collapse");
+        e.classList.remove("active");
+        like(e);
+    } else {
+        // 点亮点赞
+        like.addClass("in");
+        e.setAttribute("data-collapse", "in");
+        e.classList.add("active");
+        like(e);
+    }
 }
+
+/**
+ * 点赞/取消点赞
+ * @param e
+ */
+function like(e) {
+    var commentId = e.getAttribute("data-id");
+    $.post(
+        "/like",
+        {"commentId":commentId},
+        function(data) {
+            data = $.parseJSON(data);
+            if(data.code == 0) {
+                $(e).children("b").text(data.likeCount);
+            } else {
+                alert(data.msg);
+            }
+        }
+    );
+}
+
 
 function showSelectTag() {
     $("#select-tag").show();

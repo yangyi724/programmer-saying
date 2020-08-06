@@ -78,6 +78,8 @@ public final class RedisUtil {
             }
         }
     }
+
+
     // ============================String=============================
     /**
      * 普通缓存获取
@@ -287,7 +289,7 @@ public final class RedisUtil {
      * @param by   要增加几(大于0)
      * @return
      */
-    public double hincr(String key, String item, double by) {
+    public Long hincr(String key, String item, int by) {
         return redisTemplate.opsForHash().increment(key, item, by);
     }
     /**
@@ -298,7 +300,7 @@ public final class RedisUtil {
      * @param by   要减少记(小于0)
      * @return
      */
-    public double hdecr(String key, String item, double by) {
+    public Long hdecr(String key, String item, int by) {
         return redisTemplate.opsForHash().increment(key, item, -by);
     }
     // ============================set=============================

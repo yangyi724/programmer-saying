@@ -146,6 +146,10 @@ d
     cursor: pointer;
 }
 
+.menu .like-icon:hover {
+    color: #499ef3;
+}
+
 .menu .comment-icon {
     font-size: 15px;
     cursor: pointer;
@@ -159,9 +163,7 @@ d
     color: #499ef3;
 }
 
-.menu .like-icon:hover {
-    color: #499ef3;
-}
+
 
 .footer {
     text-align: center;

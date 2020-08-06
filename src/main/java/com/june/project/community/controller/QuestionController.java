@@ -1,11 +1,11 @@
 package com.june.project.community.controller;
 
-import com.june.project.community.consts.RedisKey;
-import com.june.project.community.dto.CommentCreateDTO;
 import com.june.project.community.dto.CommentDTO;
 import com.june.project.community.dto.QuestionDTO;
 import com.june.project.community.enums.CommentTypeEnum;
+import com.june.project.community.enums.RedisKeyEnum;
 import com.june.project.community.service.CommentService;
+import com.june.project.community.service.LikeService;
 import com.june.project.community.service.QuestionService;
 import com.june.project.community.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,9 @@ public class QuestionController {
     private CommentService commentService;
 
     @Autowired
+    private LikeService likeService;
+
+    @Autowired
     private RedisUtil redisUtil;
 
     // 从"question/{id}"的 id 拿到数据存储在 Integer id 中，这是对应于数据库中 question 的 id
@@ -44,26 +47,29 @@ public class QuestionController {
         // questionService.incView(questionId);
 
         // redis 记录累加阅读数
-        String key= RedisKey.ARTICLE_VIEWCOUNT_CODE+questionId; // viewCount_x
+
+        String key= RedisKeyEnum.QUESTION_VIEW_COUNT_CODE.getKey() + questionId; // viewCount_x
         //找到redis中该问题的浏览数，如果不存在则向redis中添加一条
-        Map<Object, Object> viewCountItem = redisUtil.hmget(RedisKey.ARTICLE_VIEWCOUNT_KEY);
+
+        Map<Object, Object> viewCountItem = redisUtil.hmget(RedisKeyEnum.QUESTION_VIEW_COUNT_KEY.getKey());
         Integer viewCount = 0;
         if (!viewCountItem.isEmpty()) {
             if (viewCountItem.containsKey(key)) {
                 viewCount = (Integer) viewCountItem.get(key);
-                redisUtil.hset(RedisKey.ARTICLE_VIEWCOUNT_KEY, key, viewCount + 1);
+                redisUtil.hset(RedisKeyEnum.QUESTION_VIEW_COUNT_KEY.getKey(), key, viewCount + 1);
                 viewCount = viewCount + 1;
             } else {
-                redisUtil.hset(RedisKey.ARTICLE_VIEWCOUNT_KEY, key, 1);
+                redisUtil.hset(RedisKeyEnum.QUESTION_VIEW_COUNT_KEY.getKey(), key, 1);
             }
         } else {
-            redisUtil.hset(RedisKey.ARTICLE_VIEWCOUNT_KEY, key, 1);
+            redisUtil.hset(RedisKeyEnum.QUESTION_VIEW_COUNT_KEY.getKey(), key, 1);
         }
 
         QuestionDTO questionDTO = questionService.getById(questionId);
         List<QuestionDTO> relatedQuestions = questionService.selectRelated(questionDTO);
         List<CommentDTO> comments = commentService.listByTargetId(questionId, CommentTypeEnum.QUESTION);
         int totalViewCount = viewCount + questionDTO.getViewCount();
+
         model.addAttribute("viewCount", totalViewCount);
         model.addAttribute("question", questionDTO);
         model.addAttribute("comments", comments);
