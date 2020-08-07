@@ -47,11 +47,13 @@ public class LikeService {
                 boolean exists = redisLikeService.hasLikedInfoFromRedis(commentId, userId);
                 redisOperations.multi();
                 if(exists) {
+                    // 如果redis中存在点赞信息，那么取消点赞
                     redisLikeService.deleteLikedFromRedis(commentId, userId);
-                    redisLikeService.decrementLikedCount(commentId);
+                    decLikedCount(commentId);
                 } else {
+                    // 如果redis中不存在点赞信息，那么点赞
                     redisLikeService.saveLiked2Redis(commentId, userId);
-                    redisLikeService.incrementLikedCount(commentId);
+                    incLikedCount(commentId);
                 }
                 redisOperations.exec();
                 return null;
@@ -59,13 +61,58 @@ public class LikeService {
         });
     }
 
+
+    /**
+     *  该回复的点赞数加一
+     *  更新操作，先更新DB，然后删除缓存
+     * @param commentId
+     */
+    public void incLikedCount(Long commentId) {
+        // DB加一
+        commentService.incLikeById(commentId);
+        // 删除缓存
+        redisLikeService.delLikedCountFromRedis(commentId);
+    }
+
+    /**
+     *  该回复的点赞数减一
+     *  更新操作，先更新DB，然后删除缓存
+     * @param commentId
+     */
+    public void decLikedCount(Long commentId) {
+        // DB减一
+        commentService.decLikeById(commentId);
+        // 删除缓存
+        redisLikeService.delLikedCountFromRedis(commentId);
+    }
+
+
     /**
      * 获取点赞数量
+     * 读操作
      * @param commentId
      * @return
      */
     public int getTotalLikeCount(Long commentId) {
-        return redisLikeService.getLikedCountFromRedis(commentId);
+        Object retFromRedis = redisLikeService.getLikedCountFromRedis(commentId);
+        if(retFromRedis != null) {
+            // 从redis读不为空，直接返回
+            return (int) retFromRedis;
+        } else {
+            // 从redis读为空，从数据库读
+            Comment comment = commentService.getByCommentId(commentId);
+            // 从DB读为空，直接返回
+            if(comment == null) {
+                return 0;
+            }
+            Long likeCount = comment.getLikeCount();
+            // 从DB读为空，直接返回
+            if(likeCount == null)
+                return 0;
+            // 从DB读不为空，先写入缓存，再返回
+            redisLikeService.saveLikedCount2Redis(commentId, Integer.parseInt(String.valueOf(likeCount)));
+            return Integer.parseInt(String.valueOf(likeCount));
+        }
     }
 
     /**
@@ -74,10 +121,10 @@ public class LikeService {
      * @param userId
      * @return
      */
-    public int getLikeStatus(Long commentId, Long userId) {
-        return redisLikeService.hasLikedInfoFromRedis(commentId, userId) ? LikedStatusEnum.LIKE.getStatus() :
-                LikedStatusEnum.UNLIKE.getStatus();
-    }
+//    public int getLikeStatus(Long commentId, Long userId) {
+//        return redisLikeService.hasLikedInfoFromRedis(commentId, userId) ? LikedStatusEnum.LIKE.getStatus() :
+//                LikedStatusEnum.UNLIKE.getStatus();
+//    }
 
     public LikedInfo getByCommentIdAndUserId(Long commentId, Long userId) {
         LikedInfoExample likedInfoExample = new LikedInfoExample();
@@ -132,14 +179,14 @@ public class LikeService {
     /**
      * 将Redis中的点赞数量存入数据库
      */
-    @Transactional
-    public void transLikedCountFromRedis2DB() {
-        List<LikedCountDTO> likedCountDTOS = redisLikeService.getLikedCountFromRedis();
-        for (LikedCountDTO likedCountDTO : likedCountDTOS) {
-            Comment comment = commentService.getByCommentId(likedCountDTO.getCommentId());
-            if(comment != null) {
-                commentService.updateCountById(likedCountDTO.getCommentId(), likedCountDTO.getLikeCount());
-            }
-        }
-    }
+//    @Transactional
+//    public void transLikedCountFromRedis2DB() {
+//        List<LikedCountDTO> likedCountDTOS = redisLikeService.getLikedCountFromRedis();
+//        for (LikedCountDTO likedCountDTO : likedCountDTOS) {
+//            Comment comment = commentService.getByCommentId(likedCountDTO.getCommentId());
+//            if(comment != null) {
+//                commentService.updateCountById(likedCountDTO.getCommentId(), likedCountDTO.getLikeCount());
+//            }
+//        }
+//    }
 }

@@ -1,6 +1,5 @@
 package com.june.project.community.schedule;
 
-import com.june.project.community.enums.RedisKeyEnum;
 import com.june.project.community.service.LikeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
 
 /**
  * @author 延君
@@ -22,11 +20,11 @@ public class SyncLike {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Scheduled(cron = "0 0/1 * * * ? ")//每1分钟
+    @Scheduled(cron = "0/15 * * * * ? ") //每15秒
     public void SyncNodesAndShips() {
         logger.info("开始保存点赞信息");
         try {
-            likeService.transLikedCountFromRedis2DB();
+            // likeService.transLikedCountFromRedis2DB();
             likeService.transLikedInfoFromRedis2DB();
         } catch (Exception e) {
             logger.error(e.getMessage());

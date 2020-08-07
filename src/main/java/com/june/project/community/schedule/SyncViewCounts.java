@@ -24,23 +24,21 @@ public class SyncViewCounts {
     @Autowired
     private QuestionService questionService;
 
-    @Scheduled(cron = "0 0/1 * * * ? ")//每1分钟
+    @Scheduled(cron = "0 0/1 * * * ? ") //每1分钟
     public void SyncNodesAndShips() {
         logger.info("开始保存浏览数");
         try {
-            //先获取这段时间的浏览数
+            // 先获取这段时间的浏览数
             Map<Object,Object> viewCountItem=redisUtil.hmget(RedisKeyEnum.QUESTION_VIEW_COUNT_KEY.getKey());
-            //然后删除redis里这段时间的浏览数
-            redisUtil.remove(RedisKeyEnum.QUESTION_VIEW_COUNT_KEY.getKey());
             if(!viewCountItem.isEmpty()){
                 for(Object item :viewCountItem.keySet()){
-                    String questionKey=item.toString();//viewcount_1
+                    String questionKey=item.toString();
                     String[]  kv=questionKey.split("_");
                     Long questionId=Long.parseLong(kv[1]);
                     Integer viewCount=(Integer) viewCountItem.get(questionKey);
                     System.out.println("问题id:"+questionId+"浏览量:"+viewCount);
-                    //更新到数据库
-                    questionService.incMoreView(questionId, viewCount);
+                    // 更新到数据库
+                    questionService.setViewCount(questionId, viewCount);
                 }
             }
         } catch (Exception e) {

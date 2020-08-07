@@ -1,6 +1,7 @@
 package com.june.project.community.controller;
 
 import com.june.project.community.dto.CommentDTO;
+import com.june.project.community.dto.LikeAndCommentDTO;
 import com.june.project.community.dto.QuestionDTO;
 import com.june.project.community.enums.CommentTypeEnum;
 import com.june.project.community.enums.RedisKeyEnum;
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,43 +38,56 @@ public class QuestionController {
     @Autowired
     private RedisUtil redisUtil;
 
-    // 从"question/{id}"的 id 拿到数据存储在 Integer id 中，这是对应于数据库中 question 的 id
+
     @GetMapping("/question/{id}")
-    public String question(@PathVariable(name = "id") String id, // 接收请求路径中占位符的值
+    public String question(@PathVariable(name = "id") String id,
                            Model model) {
         Long questionId = null;
         questionId = Long.parseLong(id);
 
-        // 累加阅读数，累加的量先存入 redis，以后再定时写入数据库，减少对数据库频繁的写操作
         // questionService.incView(questionId);
 
-        // redis 记录累加阅读数
-
-        String key= RedisKeyEnum.QUESTION_VIEW_COUNT_CODE.getKey() + questionId; // viewCount_x
-        //找到redis中该问题的浏览数，如果不存在则向redis中添加一条
+        // redis 记录累加阅读数 viewCount_x
+        String key= RedisKeyEnum.QUESTION_VIEW_COUNT_CODE.getKey() + questionId;
 
         Map<Object, Object> viewCountItem = redisUtil.hmget(RedisKeyEnum.QUESTION_VIEW_COUNT_KEY.getKey());
         Integer viewCount = 0;
         if (!viewCountItem.isEmpty()) {
             if (viewCountItem.containsKey(key)) {
+                // 若redis中有该问题的浏览量，+1
                 viewCount = (Integer) viewCountItem.get(key);
                 redisUtil.hset(RedisKeyEnum.QUESTION_VIEW_COUNT_KEY.getKey(), key, viewCount + 1);
                 viewCount = viewCount + 1;
             } else {
+                // 若redis中没有该问题的浏览量，创建
                 redisUtil.hset(RedisKeyEnum.QUESTION_VIEW_COUNT_KEY.getKey(), key, 1);
+                viewCount = 1;
             }
         } else {
+            // 若redis中没有该问题的浏览量，创建
             redisUtil.hset(RedisKeyEnum.QUESTION_VIEW_COUNT_KEY.getKey(), key, 1);
+            viewCount = 1;
         }
 
         QuestionDTO questionDTO = questionService.getById(questionId);
         List<QuestionDTO> relatedQuestions = questionService.selectRelated(questionDTO);
         List<CommentDTO> comments = commentService.listByTargetId(questionId, CommentTypeEnum.QUESTION);
-        int totalViewCount = viewCount + questionDTO.getViewCount();
 
-        model.addAttribute("viewCount", totalViewCount);
+
+        ArrayList<LikeAndCommentDTO> likeAndCommentDTOS = new ArrayList<>();
+        for (CommentDTO commentDTO : comments) {
+            LikeAndCommentDTO likeAndCommentDTO = new LikeAndCommentDTO();
+            Long commentId = commentDTO.getId();
+            // 从 redis 中读数据
+            int likeCount = likeService.getTotalLikeCount(commentId);
+            likeAndCommentDTO.setCommentDTO(commentDTO);
+            likeAndCommentDTO.setLikeCount(likeCount);
+            likeAndCommentDTOS.add(likeAndCommentDTO);
+        }
+
+        model.addAttribute("viewCount", viewCount);
         model.addAttribute("question", questionDTO);
-        model.addAttribute("comments", comments);
+        model.addAttribute("commentsAndLikeCounts", likeAndCommentDTOS);
         model.addAttribute("relatedQuestions", relatedQuestions);
         return "question";
     }

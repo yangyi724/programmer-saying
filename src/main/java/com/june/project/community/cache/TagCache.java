@@ -25,7 +25,6 @@ public class TagCache {
         framework.setTags(Arrays.asList("内存区域", "垃圾收集器", "内存分配策略", "Class类文件结构", "虚拟机类加载机制"));
         tagDTOS.add(framework);
 
-
         TagDTO server = new TagDTO();
         server.setCategoryName("并发");
         server.setTags(Arrays.asList("线程状态", "锁", "线程池"));

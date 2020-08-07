@@ -51,12 +51,10 @@ public class PublishController {
             @RequestParam(value = "id", required = false) Long id,
             HttpServletRequest request,
             Model model){
-        // model 用于把数据写到前台页面，前台可以用  th:text="${title}" 获取
         model.addAttribute("title",title);
         model.addAttribute("description",description);
         model.addAttribute("tag",tag);
         model.addAttribute("tags", TagCache.get());
-
 
         if(title == null || title == "") {
             model.addAttribute("error", "标题不能为空");

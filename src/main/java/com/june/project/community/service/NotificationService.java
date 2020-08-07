@@ -48,7 +48,9 @@ public class NotificationService {
         if (page > totalPage) {
             page = totalPage;
         }
-        paginationDTO.setPagination(totalPage, page); // 分页 4. ：通过 totalCount, page, size 算出分页需要的其他数据，如是否展示上一页，下一页，首尾页等
+
+        // 分页 4. ：通过 totalCount, page, size 算出分页需要的其他数据，如是否展示上一页，下一页，首尾页等
+        paginationDTO.setPagination(totalPage, page);
 
         // offset : size*(page-1)
         Integer offset = size * (page - 1);

@@ -29,8 +29,8 @@ import java.time.Duration;
  * @date 2020/8/5 - 21:49
  */
 @Configuration
-@EnableCaching //启用缓存
-@ConfigurationProperties(prefix = "spring.redis") //指明配置节点
+@EnableCaching
+@ConfigurationProperties(prefix = "spring.redis")
 public class RedisConfig extends CachingConfigurerSupport {
     // Redis服务器地址
     @Value("${spring.redis.host}")

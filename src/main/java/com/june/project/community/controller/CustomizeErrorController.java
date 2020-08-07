@@ -26,9 +26,7 @@ public class CustomizeErrorController implements ErrorController {
         return "error";
     }
 
-    @RequestMapping(
-            produces = {"text/html"}
-    )
+    @RequestMapping(produces = {"text/html"})
     public ModelAndView errorHtml(HttpServletRequest request,
                                   Model model) {
         HttpStatus status = this.getStatus(request);

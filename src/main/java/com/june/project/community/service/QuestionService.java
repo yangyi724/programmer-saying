@@ -2,6 +2,7 @@ package com.june.project.community.service;
 
 import com.june.project.community.dto.PaginationDTO;
 import com.june.project.community.dto.QuestionDTO;
+import com.june.project.community.enums.RedisKeyEnum;
 import com.june.project.community.exception.CustomizeErrorCode;
 import com.june.project.community.exception.CustomizeException;
 import com.june.project.community.mapper.QuestionExtMapper;
@@ -10,6 +11,7 @@ import com.june.project.community.mapper.UserMapper;
 import com.june.project.community.model.Question;
 import com.june.project.community.model.QuestionExample;
 import com.june.project.community.model.User;
+import com.june.project.community.utils.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -40,13 +43,13 @@ public class QuestionService {
     @Autowired
     private QuestionExtMapper questionExtMapper;
 
-
+    @Autowired
+    private RedisUtil redisUtil;
 
     public PaginationDTO list(Integer page, Integer size) {
 
         PaginationDTO paginationDTO = new PaginationDTO();
         Integer totalCount = (int) questionMapper.countByExample(new QuestionExample()); // 分页 3. ：通过 mapper 数据库查询到 totalCount 记录的总数
-
 
         Integer totalPage;
         if (totalCount % size == 0) {
@@ -87,7 +90,8 @@ public class QuestionService {
         QuestionExample questionExample = new QuestionExample();
         questionExample.createCriteria()
                 .andCreatorEqualTo(userId);
-        Integer totalCount = (int) questionMapper.countByExample(questionExample);// 分页 3. ：通过 mapper 数据库查询到 totalCount 记录的总数
+        // 分页 3. ：通过 mapper 数据库查询到 totalCount 记录的总数
+        Integer totalCount = (int) questionMapper.countByExample(questionExample);
 
         Integer totalPage;
         if (totalCount % size == 0) {
@@ -104,7 +108,8 @@ public class QuestionService {
             page = totalPage;
         }
 
-        paginationDTO.setPagination(totalPage, page); // 分页 4. ：通过 totalCount, page, size 算出分页需要的其他数据，如是否展示上一页，下一页，首尾页等
+        // 分页 4. ：通过 totalCount, page, size 算出分页需要的其他数据，如是否展示上一页，下一页，首尾页等
+        paginationDTO.setPagination(totalPage, page);
 
         // offset : size*(page-1)
         Integer offset = size * (page - 1);
@@ -126,7 +131,7 @@ public class QuestionService {
 
     public QuestionDTO getById(Long id) {
         Question question = questionMapper.selectByPrimaryKey(id);
-        if(question == null) {
+        if (question == null) {
             throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
         }
         QuestionDTO questionDTO = new QuestionDTO();
@@ -137,7 +142,7 @@ public class QuestionService {
     }
 
     public void createOrUpdate(Question question) {
-        if(question.getId() == null) {
+        if (question.getId() == null) {
             // 创建
             question.setGmtCreate(System.currentTimeMillis());
             question.setGmtModified(question.getGmtCreate());
@@ -157,7 +162,7 @@ public class QuestionService {
             example.createCriteria()
                     .andIdEqualTo(question.getId());
             int updated = questionMapper.updateByExampleSelective(updateQuestion, example);
-            if(updated != 1) {
+            if (updated != 1) {
                 throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
             }
         }
@@ -172,32 +177,11 @@ public class QuestionService {
         questionExtMapper.incView(question);
     }
 
-    @Transactional
-    public void incMoreView(Long id, int count) {
+    public void setViewCount(Long id, int count) {
         Question question = new Question();
         question.setId(id);
         question.setViewCount(count);
-        questionExtMapper.incView(question);
-    }
-
-    @Transactional
-    public void updateByTag(String tag) {
-        Question updateQuestion = new Question();
-        updateQuestion.setGmtModified(System.currentTimeMillis());
-        QuestionExample example = new QuestionExample();
-        example.createCriteria()
-                .andTagEqualTo(tag);
-        QuestionExample questionExample = new QuestionExample();
-        questionExample.createCriteria()
-                .andTagEqualTo("待学");
-        try {
-            questionMapper.selectByExample(questionExample);
-            questionMapper.updateByExampleSelective(updateQuestion, example);
-            Thread.sleep(60000);
-            System.out.println("sleeping...");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        questionMapper.updateByPrimaryKeySelective(question);
     }
 
     public List<QuestionDTO> selectRelated(QuestionDTO queryDTO) {

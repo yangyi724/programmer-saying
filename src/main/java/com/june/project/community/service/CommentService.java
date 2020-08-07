@@ -158,4 +158,14 @@ public class CommentService {
         comment.setLikeCount((long) likeCount);
         commentMapper.updateByPrimaryKeySelective(comment);
     }
+
+    public void incLikeById(Long commentId) {
+        Comment comment = getByCommentId(commentId);
+        updateCountById(commentId, Integer.parseInt(String.valueOf(comment.getLikeCount())) + 1);
+    }
+
+    public void decLikeById(Long commentId) {
+        Comment comment = getByCommentId(commentId);
+        updateCountById(commentId, Integer.parseInt(String.valueOf(comment.getLikeCount())) - 1);
+    }
 }

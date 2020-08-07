@@ -45,11 +45,9 @@ public class LikeController {
         }
         Long userId = user.getId();
         likeService.like(commentId, userId);
-        int likeCount = likeService.getTotalLikeCount(commentId);
-        int likeStatus = likeService.getLikeStatus(commentId, userId);
+        int likeCount = likeService.getTotalLikeCount(commentId); // ok
         Map<String, Object> map = new HashMap<>();
         map.put("likeCount", likeCount);
-        map.put("likeStatus", likeStatus);
         return JsonUtil.getJSONString(0, null, map);
     }
 

@@ -29,12 +29,6 @@ import java.io.IOException;
  */
 @Component
 public class GithubProvider {
-    /*
-     * 3. 携带 accessTokenDTO 中的 code 信息(首先要把信息从Java类型转化成JSON类型)
-     *    向 Github 的 access_token API (https://github.com/login/oauth/access_token) 发出 POST，获取 AccessToken
-     *    access_token=e72e16c7e42f292c6912e7710c838347ae178b4a&token_type=bearer
-     * 4. 获取到 access_token，返回 access_token
-     */
 //    public String getAccessToken(AccessTokenDTO accessTokenDTO) {
 //        MediaType mediaType = MediaType.get("application/json; charset=utf-8");
 //        OkHttpClient client = new OkHttpClient();
@@ -86,10 +80,6 @@ public class GithubProvider {
         return null;
     }
 
-    /*
-     * 5. 携带 access_token Github 的 user API (https://api.github.com/user?access_token=) 发出 Request，获取用户信息
-     * 6. 获取到JSON格式的用户信息，解析成Java类格式的用户信息 GithubUser
-     */
 //    public GithubUser getUser(String accessToken) {
 //        // RequestConfig defaultRequestConfig = RequestConfig.custom().setSocketTimeout(timeout * 1000).setConnectTimeout(timeout * 1000).setConnectionRequestTimeout(timeout * 1000).build();
 //        OkHttpClient client = new OkHttpClient().newBuilder().connectTimeout(60000, TimeUnit.MILLISECONDS)
