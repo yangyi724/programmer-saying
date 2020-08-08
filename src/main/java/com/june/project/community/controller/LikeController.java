@@ -1,5 +1,6 @@
 package com.june.project.community.controller;
 
+import com.june.project.community.Strategy.StrategyContext;
 import com.june.project.community.dto.ResultDTO;
 import com.june.project.community.exception.CustomizeErrorCode;
 import com.june.project.community.model.User;
@@ -30,10 +31,13 @@ import java.util.Map;
 public class LikeController {
 
     @Autowired
-    LikeService likeService;
+    private LikeService likeService;
 
     @Autowired
-    RedisTemplate redisTemplate;
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private StrategyContext strategyContext;
 
     @RequestMapping(value = "/like", method = RequestMethod.POST)
     @ResponseBody
@@ -45,7 +49,7 @@ public class LikeController {
         }
         Long userId = user.getId();
         likeService.like(commentId, userId);
-        int likeCount = likeService.getTotalLikeCount(commentId); // ok
+        int likeCount = strategyContext.getTotalLikeCount(commentId);
         Map<String, Object> map = new HashMap<>();
         map.put("likeCount", likeCount);
         return JsonUtil.getJSONString(0, null, map);

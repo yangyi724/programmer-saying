@@ -1,5 +1,6 @@
 package com.june.project.community.controller;
 
+import com.june.project.community.Strategy.StrategyContext;
 import com.june.project.community.dto.CommentDTO;
 import com.june.project.community.dto.LikeAndCommentDTO;
 import com.june.project.community.dto.QuestionDTO;
@@ -37,6 +38,9 @@ public class QuestionController {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Autowired
+    private StrategyContext strategyContext;
 
 
     @GetMapping("/question/{id}")
@@ -79,7 +83,7 @@ public class QuestionController {
             LikeAndCommentDTO likeAndCommentDTO = new LikeAndCommentDTO();
             Long commentId = commentDTO.getId();
             // 从 redis 中读数据
-            int likeCount = likeService.getTotalLikeCount(commentId);
+            int likeCount = strategyContext.getTotalLikeCount(commentId);
             likeAndCommentDTO.setCommentDTO(commentDTO);
             likeAndCommentDTO.setLikeCount(likeCount);
             likeAndCommentDTOS.add(likeAndCommentDTO);

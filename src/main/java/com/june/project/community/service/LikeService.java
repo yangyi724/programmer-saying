@@ -1,5 +1,6 @@
 package com.june.project.community.service;
 
+import com.june.project.community.Strategy.StrategyContext;
 import com.june.project.community.dto.LikedCountDTO;
 import com.june.project.community.enums.LikedStatusEnum;
 import com.june.project.community.mapper.LikedInfoMapper;
@@ -35,6 +36,9 @@ public class LikeService {
     @Autowired
     private CommentService commentService;
 
+    @Autowired
+    private StrategyContext strategyContext;
+
     /**
      * 点赞或取消点赞
      * @param commentId
@@ -49,11 +53,13 @@ public class LikeService {
                 if(exists) {
                     // 如果redis中存在点赞信息，那么取消点赞
                     redisLikeService.deleteLikedFromRedis(commentId, userId);
-                    decLikedCount(commentId);
+                    strategyContext.decLikedCount(commentId);
+                    // decLikedCount(commentId);
                 } else {
                     // 如果redis中不存在点赞信息，那么点赞
                     redisLikeService.saveLiked2Redis(commentId, userId);
-                    incLikedCount(commentId);
+                    strategyContext.incLikedCount(commentId);
+                    // incLikedCount(commentId);
                 }
                 redisOperations.exec();
                 return null;

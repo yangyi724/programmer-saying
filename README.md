@@ -1,33 +1,30 @@
-## 问答系统
+# Programmer-say
 
+## 项目背景
 
-## 资源
-[Spring](https://docs.spring.io/spring-boot/docs/2.0.0.RC1/reference/htmlsingle/#boot-features-embedded-database-support)
-[菜鸟教程](https://www.runoob.com/mysql/mysql-insert-query.html)
-[Thymeleaf](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#setting-attribute-values)
-[spring boot docs](https://docs.spring.io/spring-boot/docs/2.0.0.RC1/reference/htmlsingle/#boot-features-error-handling)
-## GitHub 登录
+一个提供给编程爱好者交流的问答平台，用户可以在网站上十分方便地使用 Github 账号登录，无需注册。此项目可以用于学习 Spring 框架，体验一个完整的 Java Web 项目的开发流程。
 
-[Creating an OAuth App](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/)
+## 技术栈
 
-[OkHttp 发出 POST](https://square.github.io/okhttp/)
+后端：SpringBoot, MyBatis, MySQL, Redis
+前端：BootStrap 框架, Thymleaf 模板引擎
 
-## 脚本
-```sql
-create table user
-(
-	id int auto_increment
-		primary key,
-	account_id varchar(100) null,
-	name varchar(50) null,
-	token char(36) null,
-	gmt_create bigint null,
-	gmt_modified bigint null
-);
-```
-```bash
-mvn flyway:migrate
-mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate
-```
+## 功能实现
+
+1. **第三方登录**：通过 OAuth 授权实现 Github 第三方登录，并使用拦截器对用户认证管理
+2. **问题发布**：用户可以发起问题，编辑问题，问题的发布支持 Markdown 语法编辑，问题支持标签分类
+3. **回复通知**：用户可以回复平台中已有的问题，支持楼中楼评论，问题被回复后发起人会收到通知
+4. **全局错误处理**：实现了全局的统一异常处理，针对可能出现的不合法行为以友好的方式提示用户
+5. **浏览量和点赞量缓存**：利用 redis 缓存数据，使用数据结构 hash
+
+## 待完善
+
+1. redis 缓存的一致性处理，策略模式
+2. Spring Security 权限管理
+3. 部署到线上，docker 容器化部署
+4. 数据库优化，数据库隔离
+5. 应用适配器模式，提升项目可扩展性
+6. 多线程优化，使用线程池
+
 
 
