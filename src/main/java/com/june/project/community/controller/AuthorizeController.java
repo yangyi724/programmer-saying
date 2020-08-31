@@ -60,7 +60,9 @@ public class AuthorizeController {
             user.setAccountId(String.valueOf(githubUser.getId()));
             user.setAvatarUrl(githubUser.getAvatarUrl());
             userService.createOrUpdate(user);
-            response.addCookie(new Cookie("token", token));
+            Cookie cookie = new Cookie("token", token);
+            cookie.setMaxAge(360000);
+            response.addCookie(cookie);
             return "redirect:/";
         } else {
             log.error("callback get github error, {}", githubUser);

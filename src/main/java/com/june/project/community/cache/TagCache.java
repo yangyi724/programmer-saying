@@ -39,6 +39,12 @@ public class TagCache {
         tool.setCategoryName("框架");
         tool.setTags(Arrays.asList("Spring", "SpringMVC", "Spring Boot", "MyBatis"));
         tagDTOS.add(tool);
+
+        TagDTO daily = new TagDTO();
+        daily.setCategoryName("记录");
+        daily.setTags(Arrays.asList("求职", "生活"));
+        tagDTOS.add(daily);
+
         return tagDTOS;
     }
 

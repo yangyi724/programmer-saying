@@ -34,9 +34,6 @@ public class LikeController {
     private LikeService likeService;
 
     @Autowired
-    private RedisTemplate redisTemplate;
-
-    @Autowired
     private StrategyContext strategyContext;
 
     @RequestMapping(value = "/like", method = RequestMethod.POST)
